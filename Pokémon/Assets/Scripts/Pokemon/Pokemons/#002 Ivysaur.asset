@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f555f8be932d14e9e324c19bf09ead, type: 3}
+  m_Name: '#002 Ivysaur'
+  m_EditorClassIdentifier: 
+  ID: 2
+  pokemonName: Ivysaur
+  description: "Este Pok\xE9mon lleva un bulbo en el lomo y, para poder con su peso,
+    tiene unas patas y un tronco gruesos y fuertes. Si empieza a pasar m\xE1s tiempo
+    al sol, ser\xE1 porque el bulbo est\xE1 a punto de hacerse una flor grande."
+  frontSprite: {fileID: 21300000, guid: c0c05abde54d6924781daeab633cb3c2, type: 3}
+  backSprite: {fileID: 21300000, guid: 4c3db608609381c46a1430e22c604646, type: 3}
+  type1: 5
+  type2: 8
+  maxHP: 60
+  attack: 62
+  defence: 63
+  spAttack: 80
+  spDefence: 80
+  speed: 60
+  learnableMoves: []

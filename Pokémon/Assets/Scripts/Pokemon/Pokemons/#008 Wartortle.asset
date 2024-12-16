@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f555f8be932d14e9e324c19bf09ead, type: 3}
+  m_Name: '#008 Wartortle'
+  m_EditorClassIdentifier: 
+  ID: 8
+  pokemonName: Wartortle
+  description: "Tiene una cola larga y cubierta de un pelo abundante y grueso que
+    se torna m\xE1s oscuro a medida que crece. Los ara\xF1azos que tiene en el caparaz\xF3n
+    dan fe de lo buen guerrero que es."
+  frontSprite: {fileID: 21300000, guid: 747a9954f40a8284d9b4f3ea4279eef1, type: 3}
+  backSprite: {fileID: 21300000, guid: 0a9c3dc36979487448de32b9b82ba1ed, type: 3}
+  type1: 3
+  type2: 0
+  maxHP: 59
+  attack: 63
+  defence: 80
+  spAttack: 65
+  spDefence: 80
+  speed: 58
+  learnableMoves: []

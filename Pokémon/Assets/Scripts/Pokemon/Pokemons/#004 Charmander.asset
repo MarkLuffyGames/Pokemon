@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6f555f8be932d14e9e324c19bf09ead, type: 3}
+  m_Name: '#004 Charmander'
+  m_EditorClassIdentifier: 
+  ID: 4
+  pokemonName: Charmander
+  description: "La llama que tiene en la punta de la cola arde seg\xFAn sus sentimientos.
+    Llamea levemente cuando est\xE1 alegre y arde vigorosamente cuando est\xE1 enfadado.\r\n"
+  frontSprite: {fileID: 21300000, guid: eb965631cfa1a684c80c7477cadef5b4, type: 3}
+  backSprite: {fileID: 21300000, guid: e0f4d0dbe38808d45b737b96b396b0f8, type: 3}
+  type1: 2
+  type2: 0
+  maxHP: 32
+  attack: 52
+  defence: 43
+  spAttack: 60
+  spDefence: 50
+  speed: 65
+  learnableMoves:
+  - move: {fileID: 11400000, guid: c806c08ba2fe16d44829ce4bba15ae0d, type: 2}
+    level: 1
+  - move: {fileID: 11400000, guid: e481d36951bf3d1488f56450333d2ba1, type: 2}
+    level: 1
+  - move: {fileID: 11400000, guid: 19bb2295374599a4b80834ac65529afd, type: 2}
+    level: 7
+  - move: {fileID: 11400000, guid: 7983621239c8bfc489ca5e25a4ded406, type: 2}
+    level: 10
+  - move: {fileID: 11400000, guid: 00ac8561d8a07884fa3d43cb4dee1bcb, type: 2}
+    level: 16
