@@ -110,7 +110,7 @@ public class BattleManager : MonoBehaviour
                 PlayerActionSelect();
                 break;
             case BattleState.SelectPokemon:
-                PlayerActionSelect();
+                if(playerUnit.pokemon.HP != 0) PlayerActionSelect();
                 break;
             default:
                 break;
@@ -311,12 +311,7 @@ public class BattleManager : MonoBehaviour
             {   
                 if(playerParty.GetFirstNoFaintedPokemon() != null)
                 {
-                    playerUnit.SetupPokemon(playerParty.GetFirstNoFaintedPokemon());
-                    battleDialogBox.SetPokemonMovement(playerUnit.pokemon);
-
-                    yield return battleDialogBox.SetDialog($"¡Adelante {playerUnit.pokemon.Base.PokemonName}!");
-
-                    PlayerActionSelect();
+                    SelectingPokemon();
                 }
                 else
                 {
@@ -484,7 +479,7 @@ public class BattleManager : MonoBehaviour
             battleDialogBox.ToggleDialogText(true);
             battleDialogBox.ToggleMovesBox(false);
             battleDialogBox.ToggleActionBox(false);
-            yield return battleDialogBox.SetDialog($"Vuelve {playerUnit.pokemon.Base.PokemonName}.");
+            if(playerUnit.pokemon.HP > 0)yield return battleDialogBox.SetDialog($"Vuelve {playerUnit.pokemon.Base.PokemonName}.");
             playerUnit.AnimationFainted();
             yield return new WaitForSeconds(1);
             yield return battleDialogBox.SetDialog($"Ve {playerPokemonList[currentPokemonSelected].Base.PokemonName}");
