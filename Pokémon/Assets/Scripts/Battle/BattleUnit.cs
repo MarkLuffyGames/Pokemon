@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -63,5 +64,14 @@ public class BattleUnit : MonoBehaviour
 
         seq.Append(transform.DOLocalMoveY(initPosition.y - 200, 1));
         seq.Join(pokemonImage.DOFade(0, 1));
+    }
+
+    public IEnumerator CapturedAnimation()
+    {
+        var seq = DOTween.Sequence();
+        seq.Append(pokemonImage.DOFade(0, 0.5f));
+        seq.Join(transform.DOScale(new Vector3(0.25f, 0.25f, 1), 0.5f));
+        seq.Join(transform.DOLocalMoveY(initPosition.y + 50f, 0.5f));
+        yield return seq.WaitForCompletion();
     }
 }

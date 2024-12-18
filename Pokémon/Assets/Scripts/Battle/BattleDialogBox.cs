@@ -31,6 +31,10 @@ public class BattleDialogBox : MonoBehaviour
     }
     public IEnumerator SetDialog(string message)
     {
+        ToggleDialogText(true);
+        ToggleActionBox(false);
+        ToggleMovesBox(false);
+
         dialogText.text = "";
         foreach (var item in message)
         {
@@ -41,6 +45,10 @@ public class BattleDialogBox : MonoBehaviour
     }
     public void SetDialogActionText(string message)
     {
+        ToggleDialogText(false);
+        ToggleMovesBox(false);
+        ToggleActionBox(true);
+
         dialogActionText.text = message;
     }
 

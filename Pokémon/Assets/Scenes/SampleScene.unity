@@ -1784,6 +1784,9 @@ MonoBehaviour:
   state: 0
   currentSelectedAction: 0
   currentSelectedMovement: 0
+  currentPokemonSelected: 0
+  isBattlePokemon: 0
+  pokeball: {fileID: 3029619347105937843, guid: b37ce334ff2f550448fdf219d70b95f8, type: 3}
 --- !u!1 &54858027
 GameObject:
   m_ObjectHideFlags: 0
@@ -5146,7 +5149,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: -1867431483
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!1 &747229929
@@ -36936,13 +36939,13 @@ MonoBehaviour:
   pokemons:
   - _base: {fileID: 11400000, guid: ff28ae14b5442784ca7909bbce9f2939, type: 2}
     nature: 0
-    level: 15
+    level: 3
   - _base: {fileID: 11400000, guid: 5f3f6868f6ad17b429c9459222b58fd8, type: 2}
     nature: 0
-    level: 15
+    level: 3
   - _base: {fileID: 11400000, guid: 91773462564ba3943ab6bb2d1f014ddf, type: 2}
     nature: 0
-    level: 15
+    level: 3
 --- !u!1 &1532187879
 GameObject:
   m_ObjectHideFlags: 0

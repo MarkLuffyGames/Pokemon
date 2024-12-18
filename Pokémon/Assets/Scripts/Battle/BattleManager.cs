@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ public enum BattleState
     PlayerAction,
     RivalAction,
     SelectPokemon,
+    Busy,
     EndBattle
 }
 public class BattleManager : MonoBehaviour
@@ -95,7 +97,7 @@ public class BattleManager : MonoBehaviour
                 SelectMovement();
                 break;
             case BattleState.SelectPokemon:
-                StartCoroutine(SelectPokemon());
+                StartCoroutine(SwitchPokemon());
                 break;
             default:
                 break;
@@ -157,9 +159,7 @@ public class BattleManager : MonoBehaviour
         state = BattleState.SelectPlayerAction;
 
         playerPartyHUD.gameObject.SetActive(false);
-        battleDialogBox.ToggleDialogText(false);
-        battleDialogBox.ToggleMovesBox(false);
-        battleDialogBox.ToggleActionBox(true);
+        
         battleDialogBox.SetDialogActionText($"¿Que deberia hacer {playerUnit.pokemon.Base.PokemonName}?");
         battleDialogBox.SelectedAction(currentSelectedAction);
 
@@ -200,7 +200,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (currentSelectedAction == 1)
         {
-            //Mochila
+            StartCoroutine(ThrowPokeball());
         }
         else if (currentSelectedAction == 2)
         {
@@ -469,7 +469,7 @@ public class BattleManager : MonoBehaviour
         playerPartyHUD.SelectPokemon(isBattlePokemon ? 0 : currentPokemonSelected);
     }
 
-    private IEnumerator SelectPokemon()
+    private IEnumerator SwitchPokemon()
     {
         if (playerPokemonList[currentPokemonSelected].HP > 0 && !isBattlePokemon)
         {
@@ -495,5 +495,72 @@ public class BattleManager : MonoBehaviour
         Pokemon temp = playerPokemonList[pokemonToChangeIndex];
         playerPokemonList[pokemonToChangeIndex] = playerPokemonList[0];
         playerPokemonList[0] = temp;
+    }
+
+    [SerializeField] private GameObject pokeball;
+    private IEnumerator ThrowPokeball()
+    {
+        state = BattleState.Busy;
+
+        yield return battleDialogBox.SetDialog($"Lanzando una {pokeball.name}");
+
+        var pokeballInstance = Instantiate(pokeball,playerUnit.transform.position + Vector3.left * 4, Quaternion.identity);
+
+        var pokeballSpt = pokeballInstance.GetComponent<SpriteRenderer>();
+
+        yield return pokeballSpt.transform.DOJump(rivalUnit.transform.position + Vector3.up * 1.5f, 1, 1, 1).WaitForCompletion();
+
+        yield return rivalUnit.CapturedAnimation();
+
+        yield return pokeballSpt.transform.DOMoveY(rivalUnit.transform.position.y - 1.5f, 0.4f).WaitForCompletion();
+
+        int numberOfShakes = TryToCatchPokemon(rivalUnit.pokemon);
+
+        for (int i = 0; i < Mathf.Min(numberOfShakes, 3); i++)
+        {
+            yield return new WaitForSeconds(1f);
+            yield return pokeballSpt.transform.DOPunchRotation(new Vector3(0,0,20),1,5).WaitForCompletion();
+        }
+
+        if(numberOfShakes == 4)
+        {
+            yield return battleDialogBox.SetDialog($"¡Has atrapado un {rivalUnit.pokemon.Base.PokemonName}!");
+            yield return new WaitForSeconds(1);
+
+            Destroy(pokeballInstance);
+            EndBattle(true);
+        }
+        else
+        {
+            Debug.Log("El pokemon a escapdo");
+        }
+
+    }
+
+    private int TryToCatchPokemon(Pokemon pokemon)
+    {
+        int bonusBall = 1;
+        int bonusStats = 1;
+
+        float a = (3 * pokemon.maxHP - 2 * pokemon.HP) * pokemon.Base.CatchRate * bonusBall * bonusStats / (3 * pokemon.maxHP);
+
+        Debug.Log(a);
+        if (a > 255)
+        {
+            return 4;
+        }
+
+        float b = 1048560 / Mathf.Sqrt(Mathf.Sqrt(16711680 / a));
+
+        int shakeCount = 0;
+
+        while (shakeCount < 4)
+        {
+            if(Random.Range(0, 65536) >= b) { break; }
+
+            shakeCount++;
+        }
+
+        return shakeCount;
     }
 }
