@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -97,7 +98,7 @@ public class BattleManager : MonoBehaviour
                 SelectMovement();
                 break;
             case BattleState.SelectPokemon:
-                StartCoroutine(SwitchPokemon());
+                StartCoroutine(ExecuteActions(2));
                 break;
             default:
                 break;
@@ -200,7 +201,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (currentSelectedAction == 1)
         {
-            StartCoroutine(ThrowPokeball());
+            StartCoroutine(ExecuteActions(1));
         }
         else if (currentSelectedAction == 2)
         {
@@ -208,7 +209,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (currentSelectedAction == 3)
         {
-            EndBattle(false);
+            StartCoroutine(ExecuteActions(3));
         }
     }
 
@@ -226,7 +227,7 @@ public class BattleManager : MonoBehaviour
     {
         if (playerUnit.pokemon.Moves[currentSelectedMovement].PowerPoints > 0)
         {
-            StartCoroutine(ExecuteMovement());
+            StartCoroutine(ExecuteActions(0));
         }
         else
         {
@@ -266,7 +267,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private IEnumerator ExecuteMovement()
+    private IEnumerator ExecuteActions(int actionTypeIndex)
     {
         state = BattleState.ExecuteActions;
 
@@ -276,23 +277,47 @@ public class BattleManager : MonoBehaviour
 
         bool playerFirst = false;
 
-        if (playerUnit.pokemon.Speed > rivalUnit.pokemon.Speed)
+        if(actionTypeIndex == 0)
         {
-            playerFirst = true;
-        }
-        else if (playerUnit.pokemon.Speed < rivalUnit.pokemon.Speed)
-        {
-            playerFirst = false;
+            if (playerUnit.pokemon.Speed > rivalUnit.pokemon.Speed)
+            {
+                playerFirst = true;
+            }
+            else if (playerUnit.pokemon.Speed < rivalUnit.pokemon.Speed)
+            {
+                playerFirst = false;
+            }
+            else
+            {
+                playerFirst = Random.Range(0, 2) == 0 ? true : false;
+            }
         }
         else
         {
-            playerFirst = Random.Range(0, 2) == 0 ? true : false;
+            playerFirst = true;
         }
+        
 
         if(playerFirst)
         {
-            yield return StartCoroutine(PlayerAttack());
-            if(!isFainted) yield return StartCoroutine(RivalAttack());
+            if(actionTypeIndex == 0)
+            {
+                yield return StartCoroutine(PlayerAttack());
+            }
+            else if(actionTypeIndex == 1)
+            {
+                yield return ThrowPokeball();
+            }
+            else if(actionTypeIndex == 2)
+            {
+                yield return SwitchPokemon();
+            }
+            else if(actionTypeIndex == 3)
+            {
+                yield return TryToScapeFromTheBattle(playerUnit.pokemon, rivalUnit.pokemon);
+            }
+
+            if (!isFainted && state == BattleState.PlayerAction) yield return StartCoroutine(RivalAttack());
         }
         else
         {
@@ -337,7 +362,9 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            // Ataques de Estado.
+            yield return battleDialogBox.SetDialog(
+            $"{playerUnit.pokemon.Base.PokemonName} a usado " +
+            $"{playerUnit.pokemon.Moves[currentSelectedMovement].MoveBase.MoveName}.");
         }
 
     }
@@ -355,7 +382,9 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            // Ataques de Estado.
+            yield return battleDialogBox.SetDialog(
+            $"{rivalUnit.pokemon.Base.PokemonName} a usado " +
+            $"{randomMove.MoveBase.MoveName}.");
         }
 
     }
@@ -473,8 +502,7 @@ public class BattleManager : MonoBehaviour
     {
         if (playerPokemonList[currentPokemonSelected].HP > 0 && !isBattlePokemon)
         {
-
-            state = BattleState.ExecuteActions;
+            state = BattleState.PlayerAction;
             playerPartyHUD.gameObject.SetActive(false);
             battleDialogBox.ToggleDialogText(true);
             battleDialogBox.ToggleMovesBox(false);
@@ -486,7 +514,7 @@ public class BattleManager : MonoBehaviour
             playerUnit.SetupPokemon(playerPokemonList[currentPokemonSelected]);
             battleDialogBox.SetPokemonMovement(playerUnit.pokemon);
             ChangePokemon(currentPokemonSelected);
-            PlayerActionSelect();
+            yield return new WaitForSeconds(1);
         }
     }
 
@@ -500,7 +528,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private GameObject pokeball;
     private IEnumerator ThrowPokeball()
     {
-        state = BattleState.Busy;
+        state = BattleState.PlayerAction;
 
         yield return battleDialogBox.SetDialog($"Lanzando una {pokeball.name}");
 
@@ -532,7 +560,9 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("El pokemon a escapdo");
+            Destroy(pokeballInstance);
+            yield return rivalUnit.BreakOutAnimation();
+
         }
 
     }
@@ -544,7 +574,6 @@ public class BattleManager : MonoBehaviour
 
         float a = (3 * pokemon.maxHP - 2 * pokemon.HP) * pokemon.Base.CatchRate * bonusBall * bonusStats / (3 * pokemon.maxHP);
 
-        Debug.Log(a);
         if (a > 255)
         {
             return 4;
@@ -552,15 +581,45 @@ public class BattleManager : MonoBehaviour
 
         float b = 1048560 / Mathf.Sqrt(Mathf.Sqrt(16711680 / a));
 
+        Debug.Log(b);
+
         int shakeCount = 0;
 
-        while (shakeCount < 4)
+        for (int i = 1; i < 4; i++)
         {
-            if(Random.Range(0, 65536) >= b) { break; }
-
-            shakeCount++;
+            if(Random.Range(0, 65536) < b)
+            {
+                shakeCount++;
+            }
         }
 
         return shakeCount;
     }
+
+    private IEnumerator TryToScapeFromTheBattle(Pokemon escapingPokemon, Pokemon rivalPokemon)
+    {
+        state = BattleState.PlayerAction;
+
+        float p = (escapingPokemon.Speed * 128 / rivalPokemon.Speed + 30);
+        if(p >= 256)
+        {
+            yield return battleDialogBox.SetDialog("Has escapado con exito");
+            EndBattle(false);
+        }
+        else
+        {
+            int random = Random.Range(0, 256);
+
+            if(random < p)
+            {
+                yield return battleDialogBox.SetDialog("Has escapado con exito");
+                EndBattle(false);
+            }
+            else
+            {
+                yield return battleDialogBox.SetDialog($"{escapingPokemon.Base.PokemonName} no pudo escapar de la batalla");
+            }
+        }
+    }
+
 }

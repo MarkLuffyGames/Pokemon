@@ -26,6 +26,7 @@ public class BattleUnit : MonoBehaviour
     {
         this.pokemon = pokemon;
         pokemonImage.color = initialColor;
+        transform.localScale = Vector3.one;
         pokemonImage.sprite = isPlayer ? pokemon.Base.BackSprite : pokemon.Base.FrontSprite;
         AnimationStartBattle();
 
@@ -72,6 +73,15 @@ public class BattleUnit : MonoBehaviour
         seq.Append(pokemonImage.DOFade(0, 0.5f));
         seq.Join(transform.DOScale(new Vector3(0.25f, 0.25f, 1), 0.5f));
         seq.Join(transform.DOLocalMoveY(initPosition.y + 50f, 0.5f));
+        yield return seq.WaitForCompletion();
+    }
+
+    public IEnumerator BreakOutAnimation()
+    {
+        var seq = DOTween.Sequence();
+        seq.Append(pokemonImage.DOFade(1, 0.5f));
+        seq.Join(transform.DOScale(new Vector3(1, 1, 1), 0.5f));
+        seq.Join(transform.DOLocalMoveY(initPosition.y, 0.5f));
         yield return seq.WaitForCompletion();
     }
 }
