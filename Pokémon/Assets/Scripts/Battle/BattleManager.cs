@@ -513,7 +513,7 @@ public class BattleManager : MonoBehaviour
             if(playerUnit.pokemon.HP > 0)yield return battleDialogBox.SetDialog($"Vuelve {playerUnit.pokemon.Base.PokemonName}.");
             playerUnit.AnimationFainted();
             yield return new WaitForSeconds(1);
-            yield return battleDialogBox.SetDialog($"Ve {playerPokemonList[currentPokemonSelected].Base.PokemonName}");
+            yield return battleDialogBox.SetDialog($"Ve {playerPokemonList[currentPokemonSelected].Base.PokemonName}.");
             playerUnit.SetupPokemon(playerPokemonList[currentPokemonSelected]);
             battleDialogBox.SetPokemonMovement(playerUnit.pokemon);
             ChangePokemon(currentPokemonSelected);
@@ -533,7 +533,7 @@ public class BattleManager : MonoBehaviour
     {
         state = BattleState.PlayerAction;
 
-        yield return battleDialogBox.SetDialog($"Lanzando una {pokeball.name}");
+        yield return battleDialogBox.SetDialog($"Lanzando una {pokeball.name}.");
 
         var pokeballInstance = Instantiate(pokeball,playerUnit.transform.position + Vector3.left * 4, Quaternion.identity);
 
@@ -557,6 +557,16 @@ public class BattleManager : MonoBehaviour
         {
             yield return battleDialogBox.SetDialog($"¡Has atrapado un {rivalUnit.pokemon.Base.PokemonName}!");
             yield return new WaitForSeconds(1);
+
+            if (playerParty.AddPokemonToParty(rivalUnit.pokemon))
+            {
+                yield return battleDialogBox.SetDialog($"{rivalUnit.pokemon.Base.PokemonName} se a agragado al equipo.");
+            }
+            else
+            {
+                yield return battleDialogBox.SetDialog($"{rivalUnit.pokemon.Base.PokemonName} se a enviado al PC.");
+            }
+            
 
             Destroy(pokeballInstance);
             EndBattle(true);
@@ -606,7 +616,7 @@ public class BattleManager : MonoBehaviour
         float p = (escapingPokemon.Speed * 128 / rivalPokemon.Speed + 30);
         if(p >= 256)
         {
-            yield return battleDialogBox.SetDialog("Has escapado con exito");
+            yield return battleDialogBox.SetDialog("Has escapado con exito.");
             EndBattle(false);
         }
         else
@@ -615,12 +625,12 @@ public class BattleManager : MonoBehaviour
 
             if(random < p)
             {
-                yield return battleDialogBox.SetDialog("Has escapado con exito");
+                yield return battleDialogBox.SetDialog("Has escapado con exito.");
                 EndBattle(false);
             }
             else
             {
-                yield return battleDialogBox.SetDialog($"{escapingPokemon.Base.PokemonName} no pudo escapar de la batalla");
+                yield return battleDialogBox.SetDialog($"{escapingPokemon.Base.PokemonName} no pudo escapar de la batalla.");
             }
         }
     }
