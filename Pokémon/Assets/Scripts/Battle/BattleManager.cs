@@ -585,7 +585,7 @@ public class BattleManager : MonoBehaviour
 
         int shakeCount = 0;
 
-        for (int i = 1; i < 4; i++)
+        for (int i = 0; i < 4; i++)
         {
             if(Random.Range(0, 65536) < b)
             {
