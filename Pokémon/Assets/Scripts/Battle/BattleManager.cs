@@ -98,7 +98,10 @@ public class BattleManager : MonoBehaviour
                 SelectMovement();
                 break;
             case BattleState.SelectPokemon:
-                StartCoroutine(ExecuteActions(2));
+                if(playerPokemonList[currentPokemonSelected].HP > 0 && !isBattlePokemon)
+                {
+                    StartCoroutine(ExecuteActions(2));
+                }
                 break;
             default:
                 break;
