@@ -100,7 +100,14 @@ public class BattleManager : MonoBehaviour
             case BattleState.SelectPokemon:
                 if(playerPokemonList[currentPokemonSelected].HP > 0 && !isBattlePokemon)
                 {
-                    StartCoroutine(ExecuteActions(2));
+                    if (playerUnit.pokemon.HP > 0)
+                    {
+                        StartCoroutine(ExecuteActions(2));
+                    }
+                    else
+                    {
+                        StartCoroutine(SwitchPokemon(true));
+                    }
                 }
                 break;
             default:
@@ -313,7 +320,7 @@ public class BattleManager : MonoBehaviour
             }
             else if(actionTypeIndex == 2)
             {
-                yield return SwitchPokemon();
+                yield return SwitchPokemon(false);
             }
             else if(actionTypeIndex == 3)
             {
@@ -501,7 +508,7 @@ public class BattleManager : MonoBehaviour
         playerPartyHUD.SelectPokemon(isBattlePokemon ? 0 : currentPokemonSelected);
     }
 
-    private IEnumerator SwitchPokemon()
+    private IEnumerator SwitchPokemon(bool currentPokemonIsFainted)
     {
         if (playerPokemonList[currentPokemonSelected].HP > 0 && !isBattlePokemon)
         {
@@ -518,6 +525,7 @@ public class BattleManager : MonoBehaviour
             battleDialogBox.SetPokemonMovement(playerUnit.pokemon);
             ChangePokemon(currentPokemonSelected);
             yield return new WaitForSeconds(1);
+            if(currentPokemonIsFainted) PlayerActionSelect();
         }
     }
 
