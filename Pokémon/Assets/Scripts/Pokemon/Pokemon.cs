@@ -34,6 +34,13 @@ public class Pokemon
         set => hp = value;
     }
 
+    private int experience;
+    public int Experience
+    {
+        get => experience;
+        set => experience = value;
+    }
+
     public Pokemon(PokemonBase @base, int level)
     {
         _base = @base;

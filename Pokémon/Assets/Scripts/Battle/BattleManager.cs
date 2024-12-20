@@ -355,6 +355,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
+                yield return GetExperience();
                 EndBattle(true);
             }
         }
@@ -641,6 +642,33 @@ public class BattleManager : MonoBehaviour
                 yield return battleDialogBox.SetDialog($"{escapingPokemon.Base.PokemonName} no pudo escapar de la batalla.");
             }
         }
+    }
+
+    private IEnumerator GetExperience()
+    {
+        int baseExp = rivalUnit.pokemon.Base.BaseExp;
+        int rivalLevel = rivalUnit.pokemon.Level;
+
+        // Cálculo base de experiencia
+        float expBase = (baseExp * rivalLevel) / 5;
+        float factorNivel = (2 * rivalLevel + 10) / (rivalLevel + playerUnit.pokemon.Level + 10);
+        float experiencia = expBase * factorNivel + 1;
+
+        /*// Aplicar modificadores
+        if (esIntercambiado)
+            experiencia *= 1.5f; // +50% por ser Pokémon intercambiado
+
+        if (tieneHuevoSuerte)
+            experiencia *= 1.5f; // +50% por Huevo Suerte
+
+        if (/tienePokerus)
+            experiencia *= 2; // +100% por Pokérus*/
+
+        // Redondear y devolver como entero
+        experiencia = Mathf.FloorToInt(experiencia);
+
+        playerUnit.pokemon.Experience += (int)experiencia;
+        yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} a ganado {experiencia} de experiencia.");
     }
 
 }
