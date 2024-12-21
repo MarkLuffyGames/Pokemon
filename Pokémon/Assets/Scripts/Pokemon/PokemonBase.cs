@@ -19,6 +19,7 @@ public class PokemonBase : ScriptableObject
 
     [SerializeField] private int catchRate;
     [SerializeField] private int baseExp;
+    [SerializeField] private GrowthRate growthRate;
 
     //Stats
     [SerializeField] private int maxHP;
@@ -51,8 +52,49 @@ public class PokemonBase : ScriptableObject
 
     public List<LearnableMoves> LearnableMoves => learnableMoves;
 
+
+    public int GetNecessaryExpForNextLevel(int level)
+    {
+        switch (growthRate)
+        {
+            case GrowthRate.Erratic:
+                if(level < 50)
+                    return Mathf.FloorToInt((Mathf.Pow(level, 3) * (100 - level)) / 50);
+                else if(level < 68)
+                    return Mathf.FloorToInt((Mathf.Pow(level, 3) * (150 - level)) / 100);
+                else if(level < 98)
+                    return Mathf.FloorToInt(Mathf.Pow(level, 3) * ((1911 - level*10) / 3) / 500);
+                else
+                    return Mathf.FloorToInt((Mathf.Pow(level, 3) * (160 - level)) / 100);
+
+            case GrowthRate.Fast:
+                return Mathf.FloorToInt(4 * Mathf.Pow(level, 3) / 5);
+
+            case GrowthRate.MediumFast:
+                return Mathf.FloorToInt(Mathf.Pow(level, 3));
+
+            case GrowthRate.MediumSlow:
+                return Mathf.FloorToInt(6 * Mathf.Pow(level, 3) / 5 - 15 * Mathf.Pow(level, 2) + 100 * level - 140);
+
+            case GrowthRate.Slow:
+                return Mathf.FloorToInt(5 * Mathf.Pow(level, 3) / 4);
+
+            case GrowthRate.Fluctuating:
+                if (level < 15)
+                    return Mathf.FloorToInt(Mathf.Pow(level, 3) * ((level + 1) / 3 + 24) / 50);
+                else if (level < 36)
+                    return Mathf.FloorToInt(Mathf.Pow(level, 3) * (level + 14) / 50);
+                else
+                    return Mathf.FloorToInt(Mathf.Pow(level, 3) * (level / 2 + 32) / 50);
+        }
+        return -1;
+    }
 }
 
+public enum GrowthRate
+{
+    Erratic, Fast, MediumFast, MediumSlow, Slow, Fluctuating
+}
 public enum PokemonType
 {
     None,

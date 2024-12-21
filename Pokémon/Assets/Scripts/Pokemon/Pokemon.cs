@@ -226,7 +226,7 @@ public class Pokemon
         return iv;
     }
 
-    public void AddEVs(int hp, int attack, int defense, int specialAttack, int specialDefense, int speed)
+    public void AddEVs(int hp = 0, int attack = 0, int defense = 0, int specialAttack = 0, int specialDefense = 0, int speed = 0)
     {
         evStats.HP += hp;
         evStats.Attack += attack;

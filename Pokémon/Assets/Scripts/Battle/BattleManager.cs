@@ -356,6 +356,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 yield return GetExperience();
+
                 EndBattle(true);
             }
         }
@@ -433,7 +434,6 @@ public class BattleManager : MonoBehaviour
         move.PowerPoints--;
 
         var damageDescription = defender.pokemon.RecibeDamage(move, attacker.pokemon);
-        var isfainted = damageDescription.IsFainted;
 
         yield return battleDialogBox.SetDialog(
             $"{attacker.pokemon.Base.PokemonName} a usado " +
@@ -459,7 +459,7 @@ public class BattleManager : MonoBehaviour
             $"¡Ha sido un golpe crítico!");
         }
 
-        if (isfainted)
+        if (damageDescription.IsFainted)
         {
             this.isFainted = true;
             yield return battleDialogBox.SetDialog($"{defender.pokemon.Base.PokemonName} se a debilitado.");
