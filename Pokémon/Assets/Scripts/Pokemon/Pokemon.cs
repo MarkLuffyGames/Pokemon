@@ -46,6 +46,11 @@ public class Pokemon
         _base = @base;
         this.level = level;
 
+        InitPokemon();
+    }
+
+    public void InitPokemon()
+    {
         nature = (Nature)Random.Range(0, Enum.GetValues(typeof(Nature)).Length);
 
         ivStats = GenerateIVs();
@@ -61,26 +66,7 @@ public class Pokemon
         };
 
         hp = maxHP;
-
-        moves = new List<Move>();
-
-        foreach (var lMove in _base.LearnableMoves)
-        {
-            if(lMove.Level <= level)
-            {
-                moves.Add(new Move(lMove.Move));
-            }
-
-            if(moves.Count > 3)
-            {
-                break;
-            }
-        }
-    }
-
-    public void InitPokemon()
-    {
-        hp = maxHP;
+        experience = Base.GetNecessaryExpForNextLevel(level);
 
         moves = new List<Move>();
 

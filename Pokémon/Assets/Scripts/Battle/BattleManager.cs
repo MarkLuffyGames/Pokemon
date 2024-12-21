@@ -356,7 +356,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 yield return GetExperience();
-
+                yield return playerUnit.BattleHUD.UpdateExp(playerUnit.pokemon);
                 EndBattle(true);
             }
         }
@@ -445,7 +445,7 @@ public class BattleManager : MonoBehaviour
 
         defender.AnimationRecibeDamage();
 
-        yield return StartCoroutine(defender.BattleHUD.UpdateData(defender.pokemon.HP));
+        yield return StartCoroutine(defender.BattleHUD.UpdateHP(defender.pokemon.HP));
 
         if (damageDescription.type != "")
         {
