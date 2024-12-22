@@ -356,6 +356,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 yield return GetExperience();
+                
                 yield return playerUnit.BattleHUD.UpdateExp(playerUnit.pokemon);
                 EndBattle(true);
             }
@@ -650,9 +651,7 @@ public class BattleManager : MonoBehaviour
         int rivalLevel = rivalUnit.pokemon.Level;
 
         // Cálculo base de experiencia
-        float expBase = (baseExp * rivalLevel) / 5;
-        float factorNivel = (2 * rivalLevel + 10) / (rivalLevel + playerUnit.pokemon.Level + 10);
-        float experiencia = expBase * factorNivel + 1;
+        float experiencia = (baseExp * rivalLevel) / 7;
 
         /*// Aplicar modificadores
         if (esIntercambiado)
@@ -661,8 +660,8 @@ public class BattleManager : MonoBehaviour
         if (tieneHuevoSuerte)
             experiencia *= 1.5f; // +50% por Huevo Suerte
 
-        if (/tienePokerus)
-            experiencia *= 2; // +100% por Pokérus*/
+        if (isTrainer)
+            experiencia *= 1.5f; // +50% por combate contra entrenador*/
 
         // Redondear y devolver como entero
         experiencia = Mathf.FloorToInt(experiencia);

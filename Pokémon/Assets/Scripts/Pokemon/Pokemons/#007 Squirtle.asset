@@ -22,7 +22,8 @@ MonoBehaviour:
   type1: 3
   type2: 0
   catchRate: 45
-  baseExp: 66
+  baseExp: 1000
+  growthRate: 0
   maxHP: 44
   attack: 48
   defence: 65

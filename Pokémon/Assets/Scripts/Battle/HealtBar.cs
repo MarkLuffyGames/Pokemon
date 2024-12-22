@@ -13,7 +13,7 @@ public class HealtBar : MonoBehaviour
     [SerializeField]private int MaxHP;
     [SerializeField]private float currentHP;
 
-    [SerializeField] private float updateSpeed;
+    [SerializeField] private float updateSpeed = 10;
     [SerializeField] private Sprite[] sprites;
 
     public void SetHP(float hp, int maxHP)
@@ -43,14 +43,14 @@ public class HealtBar : MonoBehaviour
 
         while(currentHP > hp)
         {
-            currentHP -= Time.deltaTime * 10;
+            currentHP -= Time.deltaTime * updateSpeed;
             SetHP(currentHP < hp ? hp:currentHP, MaxHP);
             yield return null;
         }
         
         while(currentHP < hp)
         {
-            currentHP += Time.deltaTime;
+            currentHP += Time.deltaTime * updateSpeed;
             SetHP(currentHP, MaxHP);
             yield return null;
         }

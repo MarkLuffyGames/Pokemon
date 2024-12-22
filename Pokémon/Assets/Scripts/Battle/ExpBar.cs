@@ -10,7 +10,10 @@ public class ExpBar : MonoBehaviour
 
     [SerializeField] private float currentExp;
 
-    public void SetExp(int currentExp, int necessaryExp, int necessaryExpToNext)
+    [Tooltip("Tiempo que demora en rellenar la barra al completo")]
+    [SerializeField] private float updateSpeed = 3;
+
+    public void SetExp(float currentExp, int necessaryExp, int necessaryExpToNext)
     {
         this.currentExp = currentExp;
 
@@ -20,13 +23,11 @@ public class ExpBar : MonoBehaviour
     {
         while (this.currentExp < currentExp)
         {
-            this.currentExp += Time.deltaTime;
-            SetExp(currentExp, necessaryExp, necessaryExpToNext);
+            this.currentExp += Time.deltaTime * ((necessaryExpToNext - necessaryExp) / updateSpeed);
+            SetExp(this.currentExp, necessaryExp, necessaryExpToNext);
             yield return new WaitForEndOfFrame();
         }
 
         this.currentExp = currentExp;
-
-        yield return new WaitForSeconds(1);
     }
 }

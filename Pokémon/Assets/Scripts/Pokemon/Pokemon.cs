@@ -14,11 +14,7 @@ public class Pokemon
     [SerializeField] private int level;
 
     public PokemonBase Base => _base;
-    public int Level
-    {
-        get => level;
-        set => level = value;
-    }
+    public int Level => level;
 
     [SerializeField] private List<Move> moves;
     public List<Move> Moves
@@ -66,7 +62,7 @@ public class Pokemon
         };
 
         hp = maxHP;
-        experience = Base.GetNecessaryExpForNextLevel(level);
+        experience = Base.GetNecessaryExpForLevel(level);
 
         moves = new List<Move>();
 
@@ -136,6 +132,16 @@ public class Pokemon
         }
 
         return new DamageDescription(critical == 1.5f ? true : false, false, returnType); ;
+    }
+
+    public void LevelUp()
+    {
+        if(experience > Base.GetNecessaryExpForLevel(level))
+        {
+            var lastHp = maxHP;
+            level++;
+            hp += maxHP - lastHp;
+        }
     }
 
     public int maxHP => CalculateHP();

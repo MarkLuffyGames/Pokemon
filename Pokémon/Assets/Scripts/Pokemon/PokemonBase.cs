@@ -53,7 +53,7 @@ public class PokemonBase : ScriptableObject
     public List<LearnableMoves> LearnableMoves => learnableMoves;
 
 
-    public int GetNecessaryExpForNextLevel(int level)
+    public int GetNecessaryExpForLevel(int level)
     {
         switch (growthRate)
         {
