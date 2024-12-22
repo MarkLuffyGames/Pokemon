@@ -142,6 +142,30 @@ public class Pokemon
             level++;
             hp += maxHP - lastHp;
         }
+        else
+        {
+            Debug.LogError("Se a intentado subir de nivel a un Pokemon que no tiene la experiencia suficiente.");
+        }
+
+    }
+
+    public void LearnMovement(Move learnedMovement)
+    {
+        moves.Add(learnedMovement);
+    }
+
+    public List<Move> CheckCanLearnNewMovement()
+    {
+        var LearnableMoves = new List<Move>();
+        foreach (var lMove in _base.LearnableMoves)
+        {
+            if (lMove.Level == level)
+            {
+                LearnableMoves.Add(new Move(lMove.Move));
+            }
+        }
+
+        return LearnableMoves;
     }
 
     public int maxHP => CalculateHP();

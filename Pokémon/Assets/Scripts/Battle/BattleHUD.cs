@@ -25,26 +25,9 @@ public class BattleHUD : MonoBehaviour
         yield return StartCoroutine(healtBar.UpdateHealt(hp));
     }
 
-    public IEnumerator UpdateExp(Pokemon pokemon)
+    public IEnumerator UpdateExp(int currentExp, int necessaryExp, int necessaryExpToNext)
     {
-        int currentExp = pokemon.Experience;
-        int necessaryExp = pokemon.Base.GetNecessaryExpForLevel(pokemon.Level);
-        int necessaryExpToNext = pokemon.Base.GetNecessaryExpForLevel(pokemon.Level + 1);
-
-        if (currentExp > necessaryExpToNext)
-        {
-            yield return StartCoroutine(expBar.UpdateExp(necessaryExpToNext, necessaryExp, necessaryExpToNext));
-            pokemon.LevelUp();
-            SetPokemonData(pokemon, true);
-            yield return new WaitForSeconds(1);
-            yield return UpdateExp(pokemon);
-        }
-        else
-        {
-            yield return StartCoroutine(expBar.UpdateExp(currentExp, necessaryExp, necessaryExpToNext));
-        }
-
-        yield return new WaitForSeconds(1);
+        yield return StartCoroutine(expBar.UpdateExp(necessaryExpToNext, necessaryExp, necessaryExpToNext));
     }
 
 }

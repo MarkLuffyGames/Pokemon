@@ -356,8 +356,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 yield return GetExperience();
-                
-                yield return playerUnit.BattleHUD.UpdateExp(playerUnit.pokemon);
+
                 EndBattle(true);
             }
         }
@@ -663,11 +662,47 @@ public class BattleManager : MonoBehaviour
         if (isTrainer)
             experiencia *= 1.5f; // +50% por combate contra entrenador*/
 
-        // Redondear y devolver como entero
-        experiencia = Mathf.FloorToInt(experiencia);
-
-        playerUnit.pokemon.Experience += (int)experiencia;
+        playerUnit.pokemon.Experience += Mathf.FloorToInt(experiencia);
         yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} a ganado {experiencia} de experiencia.");
+
+        yield return LevelUp();
+    }
+
+    private IEnumerator LevelUp()
+    {
+        int currentExp = playerUnit.pokemon.Experience;
+        int necessaryExp = playerUnit.pokemon.Base.GetNecessaryExpForLevel(playerUnit.pokemon.Level);
+        int necessaryExpToNext = playerUnit.pokemon.Base.GetNecessaryExpForLevel(playerUnit.pokemon.Level + 1);
+
+        if (playerUnit.pokemon.Experience > playerUnit.pokemon.Base.GetNecessaryExpForLevel(playerUnit.pokemon.Level + 1))
+        {
+            yield return playerUnit.BattleHUD.UpdateExp(necessaryExpToNext, necessaryExp, necessaryExpToNext);
+            playerUnit.pokemon.LevelUp();
+            playerUnit.BattleHUD.SetPokemonData(playerUnit.pokemon, true);
+            if (playerUnit.pokemon.CheckCanLearnNewMovement().Count > 0)
+            {
+                foreach (var move in playerUnit.pokemon.CheckCanLearnNewMovement())
+                {
+                    if (playerUnit.pokemon.Moves.Count < 4)
+                    {
+                        playerUnit.pokemon.LearnMovement(move);
+                        yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} a aprendido {move.MoveBase.MoveName}.");
+                    }
+                    else
+                    {
+                        yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} intenta aprender {move.MoveBase.MoveName}.");
+                        yield return battleDialogBox.SetDialog($"Pero {playerUnit.pokemon.Base.PokemonName} ya conoce cuatro movimientos.");
+                    }
+                }
+            }
+            yield return new WaitForSeconds(1);
+            yield return LevelUp();
+        }
+        else
+        {
+            yield return playerUnit.BattleHUD.UpdateExp(currentExp, necessaryExp, necessaryExpToNext);
+        }
+        
     }
 
 }
