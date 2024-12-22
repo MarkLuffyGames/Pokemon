@@ -701,6 +701,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             yield return playerUnit.BattleHUD.UpdateExp(currentExp, necessaryExp, necessaryExpToNext);
+            yield return new WaitForSeconds(1);
         }
         
     }

@@ -27,7 +27,7 @@ public class BattleHUD : MonoBehaviour
 
     public IEnumerator UpdateExp(int currentExp, int necessaryExp, int necessaryExpToNext)
     {
-        yield return StartCoroutine(expBar.UpdateExp(necessaryExpToNext, necessaryExp, necessaryExpToNext));
+        yield return StartCoroutine(expBar.UpdateExp(currentExp, necessaryExp, necessaryExpToNext));
     }
 
 }
