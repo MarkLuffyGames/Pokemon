@@ -18,6 +18,7 @@ public enum BattleState
     PlayerAction,
     RivalAction,
     SelectPokemon,
+    SelectAnswer,
     Busy,
     EndBattle
 }
@@ -36,8 +37,10 @@ public class BattleManager : MonoBehaviour
 
     [SerializeField] private int currentSelectedAction;
     [SerializeField] private int currentSelectedMovement;
+    [SerializeField] private int currentSelectedAnswer;
     [SerializeField] private int currentPokemonSelected;
     [SerializeField] private bool isBattlePokemon;
+    [SerializeField] private bool isSelectedAnswer;
 
     private InputAction moveMenu;
     private InputAction select;
@@ -69,17 +72,20 @@ public class BattleManager : MonoBehaviour
     {
         if (moveMenu.WasPressedThisFrame())
         {
-            var noveDir = OneDirectionMove.OneDirection(moveMenu.ReadValue<Vector2>().normalized,Vector3.zero);
+            var MoveDir = OneDirectionMove.OneDirection(moveMenu.ReadValue<Vector2>().normalized,Vector3.zero);
             switch (state)
             {
                 case BattleState.SelectPlayerAction:
-                    HandlePlayerActionSelection(noveDir);
+                    HandlePlayerActionSelection(MoveDir);
                     break;
                 case BattleState.SelectPlayerMovemet:
-                    HandlePlayerMovementSelection(noveDir);
+                    HandlePlayerMovementSelection(MoveDir);
                     break;
                 case BattleState.SelectPokemon:
-                    HandleSelectPokemon(noveDir);
+                    HandleSelectPokemon(MoveDir);
+                    break;
+                case BattleState.SelectAnswer:
+                    AnswerSelector(MoveDir);
                     break;
                 default:
                     break;
@@ -109,6 +115,9 @@ public class BattleManager : MonoBehaviour
                         StartCoroutine(SwitchPokemon(true));
                     }
                 }
+                break;
+            case BattleState.SelectAnswer:
+                isSelectedAnswer = true;
                 break;
             default:
                 break;
@@ -144,6 +153,7 @@ public class BattleManager : MonoBehaviour
 
         currentSelectedAction = 0;
         currentSelectedMovement = 0;
+        currentSelectedAnswer = 0;
 
         battleDialogBox.StartBattle();
 
@@ -275,6 +285,14 @@ public class BattleManager : MonoBehaviour
                 if (index + 1 <= positionAmount) index += 1;
             }
         }
+    }
+
+    private void AnswerSelector(Vector2 moveDir)
+    {
+        if (moveDir == Vector2.up) currentSelectedAnswer = 0;
+        if (moveDir == Vector2.down) currentSelectedAnswer = 1;
+
+        battleDialogBox.SelectAnswer(currentSelectedAnswer);
     }
 
     private IEnumerator ExecuteActions(int actionTypeIndex)
@@ -679,6 +697,7 @@ public class BattleManager : MonoBehaviour
             yield return playerUnit.BattleHUD.UpdateExp(necessaryExpToNext, necessaryExp, necessaryExpToNext);
             playerUnit.pokemon.LevelUp();
             playerUnit.BattleHUD.SetPokemonData(playerUnit.pokemon, true);
+            yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} subido al nivel {playerUnit.pokemon.Level}");
             if (playerUnit.pokemon.CheckCanLearnNewMovement().Count > 0)
             {
                 foreach (var move in playerUnit.pokemon.CheckCanLearnNewMovement())
@@ -687,11 +706,33 @@ public class BattleManager : MonoBehaviour
                     {
                         playerUnit.pokemon.LearnMovement(move);
                         yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} a aprendido {move.MoveBase.MoveName}.");
+                        battleDialogBox.SetPokemonMovement(playerUnit.pokemon);
                     }
                     else
                     {
                         yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} intenta aprender {move.MoveBase.MoveName}.");
                         yield return battleDialogBox.SetDialog($"Pero {playerUnit.pokemon.Base.PokemonName} ya conoce cuatro movimientos.");
+                        yield return battleDialogBox.SetDialog($"Quieres sustituir uno de esos movimientos por {move.MoveBase.MoveName}.");
+
+                        battleDialogBox.ToggleAnswerBox(true);
+                        battleDialogBox.SelectAnswer(currentSelectedAnswer);
+                        while (!isSelectedAnswer)
+                        {
+                            state = BattleState.SelectAnswer;
+                            yield return null;
+                        }
+                        state = BattleState.PlayerAction;
+
+                        isSelectedAnswer = false;
+
+                        if(currentSelectedAnswer == 0)
+                        {
+
+                        }
+                        else
+                        {
+                            yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} no aprendio {move.MoveBase.MoveName}.");
+                        }
                     }
                 }
             }

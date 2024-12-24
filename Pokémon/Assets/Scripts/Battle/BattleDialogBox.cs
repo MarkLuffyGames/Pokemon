@@ -16,9 +16,11 @@ public class BattleDialogBox : MonoBehaviour
 
     [SerializeField] private GameObject actionBox;
     [SerializeField] private GameObject movesBox;
+    [SerializeField] private GameObject answerBox;
 
     [SerializeField] private List<TextMeshProUGUI> actionsTexts;
     [SerializeField] private List<TextMeshProUGUI> movementTexts;
+    [SerializeField] private List<TextMeshProUGUI> answerTexts;
 
     [SerializeField] private TextMeshProUGUI ppText;
     [SerializeField] private TextMeshProUGUI typeText;
@@ -28,12 +30,14 @@ public class BattleDialogBox : MonoBehaviour
         ToggleDialogText(true);
         ToggleActionBox(false);
         ToggleMovesBox(false);
+        ToggleAnswerBox(false);
     }
     public IEnumerator SetDialog(string message)
     {
         ToggleDialogText(true);
         ToggleActionBox(false);
         ToggleMovesBox(false);
+        ToggleAnswerBox(false);
 
         dialogText.text = "";
         foreach (var item in message)
@@ -48,6 +52,7 @@ public class BattleDialogBox : MonoBehaviour
         ToggleDialogText(false);
         ToggleMovesBox(false);
         ToggleActionBox(true);
+        ToggleAnswerBox(false);
 
         dialogActionText.text = message;
     }
@@ -65,6 +70,11 @@ public class BattleDialogBox : MonoBehaviour
     public void ToggleMovesBox(bool activated)
     {
         movesBox.SetActive(activated);
+    }
+
+    public void ToggleAnswerBox(bool activated)
+    {
+        answerBox.SetActive(activated);
     }
 
     public void SelectedAction(int selectAction)
@@ -97,5 +107,13 @@ public class BattleDialogBox : MonoBehaviour
 
         ppText.text = $"PP {movement.PowerPoints}/{movement.MoveBase.PP}";
         typeText.text = $"Type: {movement.MoveBase.MoveType}";
+    }
+
+    public void SelectAnswer(int selectedAnswer)
+    {
+        for (int i = 0; i < answerTexts.Count; i++)
+        {
+            answerTexts[i].GetComponentInChildren<Image>().enabled = i == selectedAnswer ? true : false;
+        }
     }
 }
