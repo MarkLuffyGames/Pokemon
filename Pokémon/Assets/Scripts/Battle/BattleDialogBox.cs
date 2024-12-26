@@ -105,7 +105,7 @@ public class BattleDialogBox : MonoBehaviour
             movementTexts[i].GetComponentInChildren<Image>().enabled = i == selectMovement ? true : false;
         }
 
-        ppText.text = $"PP {movement.PowerPoints}/{movement.MoveBase.PP}";
+        ppText.text = $"{movement.PowerPoints}/{movement.MoveBase.PP}";
         typeText.text = $"Type: {movement.MoveBase.MoveType}";
     }
 
