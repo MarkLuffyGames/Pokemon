@@ -7,6 +7,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
 using Random = UnityEngine.Random;
 
 public enum BattleState
@@ -19,6 +20,7 @@ public enum BattleState
     RivalAction,
     SelectPokemon,
     SelectAnswer,
+    SelectMoveToForget,
     Busy,
     EndBattle
 }
@@ -33,12 +35,15 @@ public class BattleManager : MonoBehaviour
     [Tooltip("Menu de seleccion de Pokemons")]
     [SerializeField] private PartyHUD playerPartyHUD;
 
+    [SerializeField] private SelectionMoveUI selectionMoveUI;
+
     [SerializeField] private BattleState state;
 
     [SerializeField] private int currentSelectedAction;
     [SerializeField] private int currentSelectedMovement;
     [SerializeField] private int currentSelectedAnswer;
     [SerializeField] private int currentPokemonSelected;
+    [SerializeField] private int currentMovementToForget;
     [SerializeField] private bool isBattlePokemon;
     [SerializeField] private bool isSelectedAnswer;
 
@@ -87,6 +92,9 @@ public class BattleManager : MonoBehaviour
                 case BattleState.SelectAnswer:
                     AnswerSelector(MoveDir);
                     break;
+                case BattleState.SelectMoveToForget:
+                    HandleSelectMoveToForget(MoveDir);
+                    break;
                 default:
                     break;
             }
@@ -119,6 +127,9 @@ public class BattleManager : MonoBehaviour
             case BattleState.SelectAnswer:
                 isSelectedAnswer = true;
                 break;
+            case BattleState.SelectMoveToForget:
+                state = BattleState.ExecuteActions;
+                break;
             default:
                 break;
         }
@@ -133,6 +144,10 @@ public class BattleManager : MonoBehaviour
                 break;
             case BattleState.SelectPokemon:
                 if(playerUnit.pokemon.HP != 0) PlayerActionSelect();
+                break;
+            case BattleState.SelectMoveToForget:
+                currentMovementToForget = 4;
+                state = BattleState.ExecuteActions;
                 break;
             default:
                 break;
@@ -295,6 +310,22 @@ public class BattleManager : MonoBehaviour
         battleDialogBox.SelectAnswer(currentSelectedAnswer);
     }
 
+    private void HandleSelectMoveToForget(Vector2 moveDir)
+    {
+        if (moveDir == Vector2.up)
+        {
+            currentMovementToForget -= 1;
+        }
+        else if(moveDir == Vector2.down)
+        {
+            currentMovementToForget += 1;
+        }
+
+        currentMovementToForget = Mathf.Clamp(currentMovementToForget, 0, 4);
+
+        selectionMoveUI.ChangeMoveSelected(currentMovementToForget);
+    }
+
     private IEnumerator ExecuteActions(int actionTypeIndex)
     {
         state = BattleState.ExecuteActions;
@@ -374,6 +405,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 yield return GetExperience();
+
 
                 EndBattle(true);
             }
@@ -716,18 +748,19 @@ public class BattleManager : MonoBehaviour
 
                         battleDialogBox.ToggleAnswerBox(true);
                         battleDialogBox.SelectAnswer(currentSelectedAnswer);
-                        while (!isSelectedAnswer)
-                        {
-                            state = BattleState.SelectAnswer;
-                            yield return null;
-                        }
+
+                        state = BattleState.SelectAnswer;
+                        yield return new WaitUntil(() => isSelectedAnswer);
                         state = BattleState.PlayerAction;
 
                         isSelectedAnswer = false;
 
                         if(currentSelectedAnswer == 0)
                         {
-
+                            state = BattleState.SelectMoveToForget;
+                            selectionMoveUI.gameObject.SetActive(true);
+                            selectionMoveUI.SetMovementData(playerUnit.pokemon, move);
+                            yield return ForgetMovement(move);
                         }
                         else
                         {
@@ -736,7 +769,6 @@ public class BattleManager : MonoBehaviour
                     }
                 }
             }
-            yield return new WaitForSeconds(1);
             yield return LevelUp();
         }
         else
@@ -745,6 +777,28 @@ public class BattleManager : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         
+    }
+
+    private IEnumerator ForgetMovement(Move move)
+    {
+        yield return new WaitWhile(() => state == BattleState.SelectMoveToForget);
+
+        selectionMoveUI.gameObject.SetActive(false);
+
+        if(currentMovementToForget == 4)
+        {
+            yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} no aprendio {move.MoveBase.MoveName}.");
+        }
+        else
+        {
+            yield return battleDialogBox.SetDialog($"1, 2, y ...", 10);
+            yield return battleDialogBox.SetDialog($"Puff!!!");
+            yield return battleDialogBox.SetDialog($"{playerUnit.pokemon.Base.PokemonName} olvido " +
+                $"{playerUnit.pokemon.Moves[currentMovementToForget].MoveBase.MoveName} y aprendio {move.MoveBase.MoveName}.");
+
+            playerUnit.pokemon.Moves[currentMovementToForget] = move;
+        }
+
     }
 
 }

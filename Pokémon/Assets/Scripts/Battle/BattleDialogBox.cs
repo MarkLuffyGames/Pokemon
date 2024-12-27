@@ -32,7 +32,7 @@ public class BattleDialogBox : MonoBehaviour
         ToggleMovesBox(false);
         ToggleAnswerBox(false);
     }
-    public IEnumerator SetDialog(string message)
+    public IEnumerator SetDialog(string message, float textSpeed = 0)
     {
         ToggleDialogText(true);
         ToggleActionBox(false);
@@ -43,8 +43,9 @@ public class BattleDialogBox : MonoBehaviour
         foreach (var item in message)
         {
             dialogText.text += item;
-            yield return new WaitForSeconds(1 / textSpeed);
+            yield return new WaitForSeconds(1 / (textSpeed == 0 ? this.textSpeed : textSpeed));
         }
+
         yield return new WaitForSeconds(1);
     }
     public void SetDialogActionText(string message)
