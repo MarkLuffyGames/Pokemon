@@ -2,12 +2,8 @@ using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using static UnityEngine.GraphicsBuffer;
 using Random = UnityEngine.Random;
 
 public enum BattleState
@@ -759,6 +755,7 @@ public class BattleManager : MonoBehaviour
                         {
                             state = BattleState.SelectMoveToForget;
                             selectionMoveUI.gameObject.SetActive(true);
+                            currentMovementToForget = 0;
                             selectionMoveUI.SetMovementData(playerUnit.pokemon, move);
                             yield return ForgetMovement(move);
                         }
