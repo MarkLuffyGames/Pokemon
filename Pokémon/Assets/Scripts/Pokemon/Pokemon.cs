@@ -37,6 +37,9 @@ public class Pokemon
         set => experience = value;
     }
 
+    public Dictionary<Stat, int> Stats { get; private set; }
+
+
     public Pokemon(PokemonBase @base, int level)
     {
         _base = @base;
@@ -78,6 +81,15 @@ public class Pokemon
                 break;
             }
         }
+
+        Stats = new Dictionary<Stat, int>()
+        {
+            {Stat.Attack, 0},
+            {Stat.Defense, 0},
+            {Stat.SpAttack, 0},
+            {Stat.SpDefense, 0},
+            {Stat.Speed, 0},
+        };
     }
 
     public DamageDescription RecibeDamage(Move move, Pokemon pokemon)
@@ -169,11 +181,11 @@ public class Pokemon
     }
 
     public int maxHP => CalculateHP();
-    public int Attack => CalculateStat(_base.Attack, ivStats.Attack, evStats.Attack, NatureMultiplier(nature, "Attack"));
-    public int Defense => CalculateStat(_base.Defense, ivStats.Defense, evStats.Defense, NatureMultiplier(nature, "Defense"));
-    public int SpecialAttack => CalculateStat(_base.SpAttack, ivStats.SpecialAttack, evStats.SpecialAttack, NatureMultiplier(nature, "SpecialAttack"));
-    public int SpecialDefense => CalculateStat(_base.SpDefense, ivStats.SpecialDefense, evStats.SpecialDefense, NatureMultiplier(nature, "SpecialDefense"));
-    public int Speed => CalculateStat(_base.Speed, ivStats.Speed, evStats.Speed, NatureMultiplier(nature, "Speed"));
+    public int Attack => CalculateStat(_base.Attack, ivStats.Attack, evStats.Attack, NatureMultiplier(nature, "Attack"), Stats[Stat.Attack]);
+    public int Defense => CalculateStat(_base.Defense, ivStats.Defense, evStats.Defense, NatureMultiplier(nature, "Defense"), Stats[Stat.Defense]);
+    public int SpecialAttack => CalculateStat(_base.SpAttack, ivStats.SpecialAttack, evStats.SpecialAttack, NatureMultiplier(nature, "SpecialAttack"), Stats[Stat.SpAttack]);
+    public int SpecialDefense => CalculateStat(_base.SpDefense, ivStats.SpecialDefense, evStats.SpecialDefense, NatureMultiplier(nature, "SpecialDefense") , Stats[Stat.SpDefense]);
+    public int Speed => CalculateStat(_base.Speed, ivStats.Speed, evStats.Speed, NatureMultiplier(nature, "Speed") , Stats[Stat.Speed]);
 
 
 
@@ -182,9 +194,21 @@ public class Pokemon
         return ((2 * _base.MaxHP + ivStats.HP + (evStats.HP / 4)) * Level) / 100 + Level + 10;
     }
 
-    private int CalculateStat(int baseStat, int iv, int ev, float natureMultiplier)
+    private int CalculateStat(int baseStat, int iv, int ev, float natureMultiplier, int statbooster)
     {
-        return (int)((((2 * baseStat + iv + (ev / 4)) * Level) / 100 + 5) * natureMultiplier);
+        int statValue = (int)((((2 * baseStat + iv + (ev / 4)) * Level) / 100 + 5) * natureMultiplier);
+
+        float multiplier = 1.0f + Mathf.Abs(statbooster) / 2.0f;
+        if (statbooster >= 0)
+        {
+            statValue = Mathf.FloorToInt(statValue * multiplier);
+        }
+        else
+        {
+            statValue = Mathf.FloorToInt(statValue / multiplier);
+        }
+
+        return statValue;
     }
 
     private float NatureMultiplier(Nature nature, string statName)

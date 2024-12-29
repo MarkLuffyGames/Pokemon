@@ -95,6 +95,11 @@ public enum GrowthRate
 {
     Erratic, Fast, MediumFast, MediumSlow, Slow, Fluctuating
 }
+
+public enum Stat
+{
+    Attack, Defense, SpAttack, SpDefense, Speed
+}
 public enum PokemonType
 {
     None,
